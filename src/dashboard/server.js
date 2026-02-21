@@ -6,6 +6,8 @@ import { dirname, join } from 'path';
 import fs from 'fs/promises';
 import { encrypt, decrypt, sanitizeInput, logSecurityEvent } from '../security/encryption.js';
 
+import crypto from 'crypto';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const projectRoot = join(__dirname, '../..');
@@ -96,8 +98,8 @@ class Dashboard {
                 envContent += `CHANNELS_DASHBOARD=${channels?.dashboard || true}\n`;
                 envContent += `NOTIFY_ORDERS=${notifications?.orders || true}\n`;
                 envContent += `NOTIFY_COMPLAINTS=${notifications?.bookings || true}\n`;
-                envContent += `JWT_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")\n`;
-                envContent += `ENCRYPTION_KEY=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")\n`;
+                envContent += `JWT_SECRET=${crypto.randomBytes(32).toString('hex')}\n`;
+                envContent += `ENCRYPTION_KEY=${crypto.randomBytes(32).toString('hex')}\n`;
 
                 await fs.writeFile(join(projectRoot, '.env'), envContent);
 
