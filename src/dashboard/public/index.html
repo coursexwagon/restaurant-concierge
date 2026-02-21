@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Concierge — Dashboard</title>
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        :root {
+            --bg: #0a0a14;
+            --surface: #12121f;
+            --surface2: #181830;
+            --surface3: #1e1e38;
+            --border: #252545;
+            --gold: #c9a84c;
+            --gold-dim: #8a7030;
+            --gold-glow: rgba(201, 168, 76, 0.12);
+            --text: #e4e4e7;
+            --text-dim: #6b6b85;
+            --green: #4ade80;
+            --green-dim: #22543d;
+            --red: #ef4444;
+            --blue: #60a5fa;
+            --orange: #fb923c;
+            --radius: 12px;
+            --font: 'Inter', system-ui, sans-serif;
+            --font-head: 'Cormorant Garamond', Georgia, serif
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 100vh
+        }
+
+        @media(max-width:900px) {
+            .layout {
+                grid-template-columns: 1fr
+            }
+
+            .sidebar {
+                display: none
+            }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column
+        }
+
+        .sidebar .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0 24px
+        }
+
+        .sidebar .brand-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--gold), #e8c95a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--bg);
+            font-weight: 700;
+            font-family: var(--font-head)
+        }
+
+        .sidebar .brand-name {
+            font-family: var(--font-head);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text)
+        }
+
+        .sidebar .brand-sub {
+            font-size: 10px;
+            color: var(--text-dim)
+        }
+
+        .sidebar nav {
+            flex: 1
+        }
+
+        .nav-section {
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            padding: 16px 12px 8px;
+            font-weight: 600
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 13px;
+            color: var(--text-dim);
+            text-decoration: none
+        }
+
+        .nav-item:hover {
+            background: var(--surface2);
+            color: var(--text)
+        }
+
+        .nav-item.active {
+            background: var(--gold-glow);
+            color: var(--gold)
+        }
+
+        .nav-item .icon {
+            width: 18px;
+            text-align: center
+        }
+
+        .nav-item .badge {
+            margin-left: auto;
+            background: var(--red);
+            color: white;
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 600
+        }
+
+        .sidebar-footer {
+            padding: 12px;
+            border-top: 1px solid var(--border);
+            margin-top: auto
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            display: inline-block;
+            margin-right: 6px;
+            animation: pulse 2s infinite
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.4
+            }
+        }
+
+        .status-text {
+            font-size: 11px;
+            color: var(--text-dim)
+        }
+
+        /* Main */
+        .main {
+            padding: 24px 28px;
+            overflow-y: auto;
+            max-height: 100vh
+        }
+
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px
+        }
+
+        .main-header h1 {
+            font-family: var(--font-head);
+            font-size: 24px;
+            font-weight: 600
+        }
+
+        .main-header .time {
+            font-size: 12px;
+            color: var(--text-dim)
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 24px
+        }
+
+        @media(max-width:1100px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr)
+            }
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            transition: border-color 0.2s
+        }
+
+        .stat-card:hover {
+            border-color: var(--gold-dim)
+        }
+
+        .stat-card .stat-label {
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .stat-card .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+            font-family: var(--font-head)
+        }
+
+        .stat-card .stat-change {
+            font-size: 11px;
+            margin-top: 4px
+        }
+
+        .stat-card .stat-change.up {
+            color: var(--green)
+        }
+
+        .stat-card .stat-change.down {
+            color: var(--red)
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 16px
+        }
+
+        @media(max-width:1100px) {
+            .content-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        /* Panels */
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden
+        }
+
+        .panel-header {
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .panel-header h3 {
+            font-size: 14px;
+            font-weight: 600
+        }
+
+        .panel-header .filter-pills {
+            display: flex;
+            gap: 4px
+        }
+
+        .pill {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-dim);
+            font-family: var(--font);
+            transition: all 0.15s
+        }
+
+        .pill:hover {
+            border-color: var(--gold-dim)
+        }
+
+        .pill.active {
+            background: var(--gold-glow);
+            border-color: var(--gold);
+            color: var(--gold)
+        }
+
+        /* Activity Feed */
+        .activity-feed {
+            max-height: 460px;
+            overflow-y: auto;
+            padding: 8px
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 10px;
+            border-radius: 8px;
+            transition: background 0.1s;
+            cursor: default
+        }
+
+        .activity-item:hover {
+            background: var(--surface2)
+        }
+
+        .activity-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0
+        }
+
+        .activity-avatar.incoming {
+            background: rgba(96, 165, 250, 0.15);
+            color: var(--blue)
+        }
+
+        .activity-avatar.outgoing {
+            background: var(--gold-glow);
+            color: var(--gold)
+        }
+
+        .activity-avatar.order {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--green)
+        }
+
+        .activity-avatar.alert {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--red)
+        }
+
+        .activity-body {
+            flex: 1;
+            min-width: 0
+        }
+
+        .activity-body .name {
+            font-size: 13px;
+            font-weight: 500
+        }
+
+        .activity-body .msg {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .activity-time {
+            font-size: 10px;
+            color: var(--text-dim);
+            flex-shrink: 0;
+            margin-top: 2px
+        }
+
+        /* Orders */
+        .orders-list {
+            padding: 8px
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 10px;
+            border-radius: 8px;
+            transition: background 0.1s
+        }
+
+        .order-item:hover {
+            background: var(--surface2)
+        }
+
+        .order-id {
+            font-size: 11px;
+            color: var(--gold);
+            font-weight: 600;
+            font-family: 'Courier New', monospace
+        }
+
+        .order-detail {
+            flex: 1
+        }
+
+        .order-detail .customer {
+            font-size: 13px;
+            font-weight: 500
+        }
+
+        .order-detail .items {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 2px
+        }
+
+        .order-status {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px
+        }
+
+        .order-status.pending {
+            background: rgba(251, 146, 60, 0.15);
+            color: var(--orange)
+        }
+
+        .order-status.confirmed {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--green)
+        }
+
+        .order-status.completed {
+            background: var(--surface3);
+            color: var(--text-dim)
+        }
+
+        .order-amount {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            min-width: 60px;
+            text-align: right
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">RC</div>
+                <div>
+                    <div class="brand-name">Restaurant Concierge</div>
+                    <div class="brand-sub" id="business-name">Loading...</div>
+                </div>
+            </div>
+            <nav>
+                <div class="nav-section">Overview</div>
+                <a class="nav-item active" data-page="dashboard"><span class="icon">📊</span>Dashboard</a>
+                <a class="nav-item" data-page="activity"><span class="icon">💬</span>Activity</a>
+                <div class="nav-section">Business</div>
+                <a class="nav-item" data-page="orders"><span class="icon">📦</span>Orders</a>
+                <a class="nav-item" data-page="bookings"><span class="icon">📅</span>Bookings</a>
+                <a class="nav-item" data-page="customers"><span class="icon">👥</span>Customers</a>
+                <div class="nav-section">System</div>
+                <a class="nav-item" data-page="settings"><span class="icon">⚙️</span>Settings</a>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="status-dot"></span><span class="status-text">Agent running</span>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="main-header">
+                <h1>Dashboard</h1>
+                <span class="time" id="live-time"></span>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">💬 Conversations Today</div>
+                    <div class="stat-value" id="s-convos">0</div>
+                    <div class="stat-change" id="s-convos-change">Loading...</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">📦 Orders Today</div>
+                    <div class="stat-value" id="s-orders">0</div>
+                    <div class="stat-change" id="s-orders-change">R0 revenue</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">👥 Active Customers</div>
+                    <div class="stat-value" id="s-customers">0</div>
+                    <div class="stat-change">Total: 0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">⚡ Avg Response</div>
+                    <div class="stat-value">1.2s</div>
+                    <div class="stat-change">Online</div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="content-grid">
+                <!-- Activity Feed -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Live Activity</h3>
+                        <div class="filter-pills"><span class="pill active">All</span></div>
+                    </div>
+                    <div class="activity-feed" id="activity-feed">
+                        <div class="activity-item">
+                            <div class="activity-avatar incoming">💬</div>
+                            <div class="activity-body">
+                                <div class="name">Waiting for messages...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Orders -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Recent Orders</h3>
+                    </div>
+                    <div class="orders-list" id="orders-list">
+                        <div class="activity-item">
+                            <div class="activity-body">
+                                <div class="msg">Loading orders...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        // Update time
+        function updateTime() { document.getElementById('live-time').textContent = new Date().toLocaleString('en-ZA', { weekday: 'long', hour: '2-digit', minute: '2-digit', second: '2-digit' }) }
+        setInterval(updateTime, 1000); updateTime();
+
+        // Load business name
+        fetch('/api/business').then(r => r.json()).then(d => {
+            document.getElementById('business-name').textContent = d.name || 'Not configured';
+        });
+
+        // Stats
+        socket.on('stats', (stats) => {
+            document.getElementById('s-convos').textContent = stats.activeSessions || 0;
+            document.getElementById('s-orders').textContent = stats.todayOrders || 0;
+            document.getElementById('s-orders-change').textContent = `R${stats.todayRevenue || 0} revenue`;
+            document.getElementById('s-customers').textContent = stats.totalOrders || 0;
+        });
+
+        // Activity feed
+        socket.on('event', (data) => {
+            if (data.type === 'message:incoming' || data.type === 'message:outgoing') {
+                const feed = document.getElementById('activity-feed');
+                const isIncoming = data.type === 'message:incoming';
+
+                feed.insertAdjacentHTML('afterbegin', `
+          <div class="activity-item" style="animation:fadeIn 0.3s">
+            <div class="activity-avatar ${isIncoming ? 'incoming' : 'outgoing'}">${isIncoming ? '💬' : '🤖'}</div>
+            <div class="activity-body">
+              <div class="name">${data.senderName || 'Customer'}</div>
+              <div class="msg">${data.message || data.response}</div>
+            </div>
+            <div class="activity-time">now</div>
+          </div>
+        `);
+
+                // Keep only last 20
+                while (feed.children.length > 20) feed.lastChild.remove();
+            }
+        });
+
+        // Load initial data
+        fetch('/api/activity').then(r => r.json()).then(data => {
+            const feed = document.getElementById('activity-feed');
+            feed.innerHTML = data.map(a => `
+        <div class="activity-item">
+          <div class="activity-avatar ${a.role === 'user' ? 'incoming' : 'outgoing'}">${a.role === 'user' ? '💬' : '🤖'}</div>
+          <div class="activity-body">
+            <div class="name">${a.senderName || 'Customer'}</div>
+            <div class="msg">${a.message}</div>
+          </div>
+          <div class="activity-time">${new Date(a.timestamp).toLocaleTimeString()}</div>
+        </div>
+      `).join('');
+        });
+
+        fetch('/api/orders').then(r => r.json()).then(data => {
+            const list = document.getElementById('orders-list');
+            list.innerHTML = data.map(o => `
+        <div class="order-item">
+          <div><div class="order-id">#${o.id?.slice(-4)}</div></div>
+          <div class="order-detail"><div class="customer">${o.customerName || 'Guest'}</div><div class="items">${o.items?.map(i => `${i.quantity}x ${i.name}`).join(', ') || 'Items'}</div></div>
+          <div class="order-status ${o.status}">${o.status || 'pending'}</div>
+          <div class="order-amount">R${o.total || 0}</div>
+        </div>
+      `).join('') || '<div class="activity-item"><div class="activity-body"><div class="msg">No orders yet</div></div></div>';
+        });
+
+        // Refresh stats every 10s
+        setInterval(() => {
+            fetch('/api/stats').then(r => r.json()).then(stats => {
+                socket.emit('stats', stats);
+            });
+        }, 10000);
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+    </style>
+</body>
+
+</html>

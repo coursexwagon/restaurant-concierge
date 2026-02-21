@@ -1,0 +1,17 @@
+{
+    "name": "",
+    "type": "restaurant",
+    "location": {
+        "address": "",
+        "city": "",
+        "googleMapsUrl": ""
+    },
+    "contact": {
+        "phone": "",
+        "email": null
+    },
+    "hours": "Mon-Sun: 10:00-22:00",
+    "description": "",
+    "services": [],
+    "createdAt": null
+}

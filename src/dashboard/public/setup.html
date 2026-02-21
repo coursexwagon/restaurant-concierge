@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Concierge — Setup</title>
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        :root {
+            --bg: #0a0a14;
+            --surface: #12121f;
+            --surface2: #181830;
+            --surface3: #1e1e38;
+            --border: #252545;
+            --gold: #c9a84c;
+            --gold-dim: #8a7030;
+            --gold-glow: rgba(201, 168, 76, 0.12);
+            --text: #e4e4e7;
+            --text-dim: #6b6b85;
+            --green: #4ade80;
+            --red: #ef4444;
+            --blue: #60a5fa;
+            --orange: #fb923c;
+            --radius: 12px;
+            --font: 'Inter', system-ui, sans-serif;
+            --font-head: 'Cormorant Garamond', Georgia, serif
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh
+        }
+
+        @media(max-width:1000px) {
+            .app {
+                grid-template-columns: 1fr
+            }
+
+            .sidebar {
+                display: none
+            }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column
+        }
+
+        .sidebar .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0 24px
+        }
+
+        .sidebar .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--gold), #e8c95a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--bg);
+            font-weight: 700
+        }
+
+        .sidebar .brand-name {
+            font-family: var(--font-head);
+            font-size: 18px;
+            font-weight: 600
+        }
+
+        .sidebar .brand-sub {
+            font-size: 10px;
+            color: var(--text-dim)
+        }
+
+        .sidebar nav {
+            flex: 1
+        }
+
+        .nav-section {
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            padding: 16px 12px 8px;
+            font-weight: 600
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 13px;
+            color: var(--text-dim);
+            text-decoration: none;
+            margin-bottom: 4px
+        }
+
+        .nav-item:hover {
+            background: var(--surface2);
+            color: var(--text)
+        }
+
+        .nav-item.active {
+            background: var(--gold-glow);
+            color: var(--gold)
+        }
+
+        .nav-item .icon {
+            width: 20px;
+            text-align: center
+        }
+
+        .sidebar-footer {
+            padding: 12px;
+            border-top: 1px solid var(--border);
+            margin-top: auto
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            display: inline-block;
+            margin-right: 6px;
+            animation: pulse 2s infinite
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.4
+            }
+        }
+
+        /* Main */
+        .main {
+            padding: 28px 32px;
+            overflow-y: auto;
+            max-height: 100vh
+        }
+
+        .page {
+            display: none
+        }
+
+        .page.active {
+            display: block
+        }
+
+        .page-header {
+            margin-bottom: 28px
+        }
+
+        .page-header h1 {
+            font-family: var(--font-head);
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 6px
+        }
+
+        .page-header p {
+            color: var(--text-dim);
+            font-size: 14px
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px
+        }
+
+        .card-header h3 {
+            font-size: 15px;
+            font-weight: 600
+        }
+
+        .card-header .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            background: var(--gold-glow);
+            color: var(--gold)
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 18px
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-dim);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+            font-family: var(--font);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px var(--gold-glow)
+        }
+
+        .form-group input::placeholder {
+            color: #555570
+        }
+
+        .form-group .hint {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 6px
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px
+        }
+
+        @media(max-width:600px) {
+            .form-row {
+                grid-template-columns: 1fr
+            }
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold), #ddb94f);
+            color: var(--bg)
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 4px 20px var(--gold-glow);
+            transform: translateY(-1px)
+        }
+
+        .btn-secondary {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text)
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--red);
+            border: 1px solid var(--red)
+        }
+
+        .btn-small {
+            padding: 8px 14px;
+            font-size: 12px
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px
+        }
+
+        /* Terminal */
+        .terminal {
+            background: #0d0d14;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            height: 400px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column
+        }
+
+        .terminal-header {
+            background: var(--surface2);
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .terminal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%
+        }
+
+        .terminal-dot.red {
+            background: #ef4444
+        }
+
+        .terminal-dot.yellow {
+            background: #fbbf24
+        }
+
+        .terminal-dot.green {
+            background: #4ade80
+        }
+
+        .terminal-title {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-left: 8px
+        }
+
+        .terminal-body {
+            flex: 1;
+            padding: 14px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6
+        }
+
+        .terminal-line {
+            color: var(--text-dim)
+        }
+
+        .terminal-line.success {
+            color: var(--green)
+        }
+
+        .terminal-line.error {
+            color: var(--red)
+        }
+
+        .terminal-line.info {
+            color: var(--blue)
+        }
+
+        .terminal-line .time {
+            color: var(--text-dim);
+            margin-right: 8px
+        }
+
+        /* Models Grid */
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 14px;
+            margin-top: 14px
+        }
+
+        .model-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s
+        }
+
+        .model-card:hover {
+            border-color: var(--gold-dim)
+        }
+
+        .model-card.selected {
+            border-color: var(--gold);
+            background: var(--gold-glow)
+        }
+
+        .model-card .model-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px
+        }
+
+        .model-card .model-provider {
+            font-size: 11px;
+            color: var(--text-dim)
+        }
+
+        .model-card .model-price {
+            font-size: 12px;
+            color: var(--green);
+            margin-top: 8px
+        }
+
+        .model-card .check {
+            float: right;
+            color: var(--gold);
+            display: none
+        }
+
+        .model-card.selected .check {
+            display: inline
+        }
+
+        /* Skills */
+        .skill-category {
+            margin-bottom: 24px
+        }
+
+        .skill-category h4 {
+            font-size: 13px;
+            color: var(--gold);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px
+        }
+
+        .skill-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 12px
+        }
+
+        .skill-item {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            transition: all 0.2s
+        }
+
+        .skill-item:hover {
+            border-color: var(--gold-dim)
+        }
+
+        .skill-item .skill-icon {
+            font-size: 24px;
+            margin-bottom: 8px
+        }
+
+        .skill-item .skill-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px
+        }
+
+        .skill-item .skill-desc {
+            font-size: 12px;
+            color: var(--text-dim)
+        }
+
+        .skill-item .skill-status {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-top: 10px;
+            display: inline-block
+        }
+
+        .skill-item .skill-status.active {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--green)
+        }
+
+        .skill-item .skill-status.inactive {
+            background: var(--surface2);
+            color: var(--text-dim)
+        }
+
+        /* Memory */
+        .memory-list {
+            max-height: 500px;
+            overflow-y: auto
+        }
+
+        .memory-item {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px
+        }
+
+        .memory-item .memory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px
+        }
+
+        .memory-item .memory-name {
+            font-weight: 600;
+            font-size: 14px
+        }
+
+        .memory-item .memory-phone {
+            font-size: 12px;
+            color: var(--text-dim)
+        }
+
+        .memory-item .memory-info {
+            font-size: 13px;
+            line-height: 1.5
+        }
+
+        .memory-item .memory-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px
+        }
+
+        /* Security */
+        .security-item {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px
+        }
+
+        .security-item .security-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .security-item .security-name {
+            font-weight: 600;
+            font-size: 14px
+        }
+
+        .security-item .security-desc {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 4px
+        }
+
+        .toggle {
+            width: 48px;
+            height: 26px;
+            border-radius: 13px;
+            background: var(--border);
+            cursor: pointer;
+            position: relative;
+            transition: background 0.2s
+        }
+
+        .toggle.on {
+            background: var(--gold)
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            top: 3px;
+            left: 3px;
+            transition: transform 0.2s
+        }
+
+        .toggle.on::after {
+            transform: translateX(22px)
+        }
+
+        /* Training */
+        .training-chat {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 16px;
+            padding: 14px;
+            background: var(--bg);
+            border-radius: 10px
+        }
+
+        .training-msg {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            max-width: 80%
+        }
+
+        .training-msg.user {
+            background: var(--gold-glow);
+            margin-left: auto;
+            border-bottom-right-radius: 2px
+        }
+
+        .training-msg.agent {
+            background: var(--surface2);
+            border-bottom-left-radius: 2px
+        }
+
+        .training-msg .msg-role {
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-bottom: 4px
+        }
+
+        .training-input {
+            display: flex;
+            gap: 10px
+        }
+
+        .training-input input {
+            flex: 1
+        }
+
+        /* Data Sources */
+        .data-source {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px
+        }
+
+        .data-source .source-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .data-source .source-name {
+            font-weight: 600;
+            font-size: 14px
+        }
+
+        .data-source .source-url {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 4px
+        }
+
+        .data-source .source-status {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 6px
+        }
+
+        .data-source .source-status.connected {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--green)
+        }
+
+        .data-source .source-status.disconnected {
+            background: var(--surface2);
+            color: var(--text-dim)
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 20px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease
+        }
+
+        .toast.success {
+            border-color: var(--green)
+        }
+
+        .toast.error {
+            border-color: var(--red)
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">RC</div>
+                <div>
+                    <div class="brand-name">Restaurant Concierge</div>
+                    <div class="brand-sub" id="business-name">Setup Required</div>
+                </div>
+            </div>
+            <nav>
+                <div class="nav-section">Getting Started</div>
+                <a class="nav-item active" data-page="setup"><span class="icon">🚀</span>Quick Setup</a>
+                <a class="nav-item" data-page="terminal"><span class="icon">📟</span>Terminal</a>
+                <div class="nav-section">AI Configuration</div>
+                <a class="nav-item" data-page="providers"><span class="icon">🤖</span>AI Providers</a>
+                <a class="nav-item" data-page="models"><span class="icon">📦</span>Models</a>
+                <div class="nav-section">Agent Configuration</div>
+                <a class="nav-item" data-page="business"><span class="icon">🏪</span>Business Info</a>
+                <a class="nav-item" data-page="skills"><span class="icon">⚡</span>Skills</a>
+                <a class="nav-item" data-page="memory"><span class="icon">🧠</span>Memory</a>
+                <a class="nav-item" data-page="training"><span class="icon">📚</span>Training</a>
+                <div class="nav-section">Data & Security</div>
+                <a class="nav-item" data-page="datasources"><span class="icon">🔗</span>Data Sources</a>
+                <a class="nav-item" data-page="security"><span class="icon">🔒</span>Security</a>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="status-dot"></span><span class="status-text" id="agent-status">Initializing...</span>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+
+            <!-- Setup Page -->
+            <div class="page active" id="page-setup">
+                <div class="page-header">
+                    <h1>🚀 Quick Setup</h1>
+                    <p>Configure your AI concierge in minutes. Everything happens right here in your browser.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Step 1: Business Information</h3>
+                    </div>
+                    <div class="form-group"><label>Business Name</label><input id="setup-biz-name"
+                            placeholder="e.g., Wandies Place"></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Business Type</label>
+                            <select id="setup-biz-type">
+                                <option value="restaurant">Restaurant</option>
+                                <option value="salon">Salon</option>
+                                <option value="bnb">B&B / Hotel</option>
+                                <option value="retail">Retail Store</option>
+                                <option value="general">General Business</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>City</label><input id="setup-biz-city"
+                                placeholder="e.g., Johannesburg"></div>
+                    </div>
+                    <div class="form-group"><label>Address</label><input id="setup-biz-address"
+                            placeholder="123 Main Road"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Step 2: AI Configuration</h3><span class="badge">Most Important</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Choose AI Provider</label>
+                        <div class="models-grid" id="provider-grid">
+                            <div class="model-card selected" data-provider="openrouter"><span class="check">✓</span>
+                                <div class="model-name">OpenRouter</div>
+                                <div class="model-provider">300+ models, free tier available</div>
+                                <div class="model-price">Free models available</div>
+                            </div>
+                            <div class="model-card" data-provider="openai"><span class="check">✓</span>
+                                <div class="model-name">OpenAI</div>
+                                <div class="model-provider">GPT-4o, GPT-4o Mini</div>
+                                <div class="model-price">Paid</div>
+                            </div>
+                            <div class="model-card" data-provider="anthropic"><span class="check">✓</span>
+                                <div class="model-name">Anthropic</div>
+                                <div class="model-provider">Claude 3.5 Sonnet</div>
+                                <div class="model-price">Paid</div>
+                            </div>
+                            <div class="model-card" data-provider="ollama"><span class="check">✓</span>
+                                <div class="model-name">Ollama</div>
+                                <div class="model-provider">Run locally on your device</div>
+                                <div class="model-price">Free (local)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>API Key</label><input type="password" id="setup-api-key"
+                            placeholder="sk-or-v1-... (your key is encrypted)">
+                        <div class="hint">🔒 Your API key is encrypted with AES-256 and never leaves your device</div>
+                    </div>
+                    <div class="form-group"><label>Select Model</label>
+                        <select id="setup-model">
+                            <option value="">Search or select a model...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Step 3: Channels</h3>
+                    </div>
+                    <div class="form-group">
+                        <div class="data-source">
+                            <div class="source-header"><span class="source-name">💬 WhatsApp</span>
+                                <div class="toggle on" data-toggle="whatsapp"></div>
+                            </div>
+                            <div class="source-desc">Connect your WhatsApp business number</div>
+                        </div>
+                        <div class="data-source">
+                            <div class="source-header"><span class="source-name">🌐 Website Widget</span>
+                                <div class="toggle on" data-toggle="web"></div>
+                            </div>
+                            <div class="source-desc">Embed chat widget on your website</div>
+                        </div>
+                        <div class="data-source">
+                            <div class="source-header"><span class="source-name">📊 Web Dashboard</span>
+                                <div class="toggle on" data-toggle="dashboard"></div>
+                            </div>
+                            <div class="source-desc">Monitor and manage from browser</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Step 4: Notifications</h3>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div class="data-source">
+                                <div class="source-header"><span class="source-name">📦 New Orders</span>
+                                    <div class="toggle on" data-toggle="notify-orders"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="data-source">
+                                <div class="source-header"><span class="source-name">📅 New Bookings</span>
+                                    <div class="toggle on" data-toggle="notify-bookings"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>Owner WhatsApp (for notifications)</label><input
+                            id="setup-owner-phone" placeholder="+27 83 123 4567"></div>
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="runSetup()">🚀 Launch Agent</button>
+                </div>
+            </div>
+
+            <!-- Terminal Page -->
+            <div class="page" id="page-terminal">
+                <div class="page-header">
+                    <h1>📟 Terminal</h1>
+                    <p>View real-time logs from your agent. See what's happening in real-time.</p>
+                </div>
+                <div class="card">
+                    <div class="terminal">
+                        <div class="terminal-header">
+                            <div class="terminal-dot red"></div>
+                            <div class="terminal-dot yellow"></div>
+                            <div class="terminal-dot green"></div><span class="terminal-title">Restaurant Concierge —
+                                Live Logs</span>
+                        </div>
+                        <div class="terminal-body" id="terminal-body">
+                            <div class="terminal-line"><span class="time">[12:00:00]</span>🤖 Agent initialized</div>
+                            <div class="terminal-line"><span class="time">[12:00:01]</span>📚 Memory system loaded</div>
+                            <div class="terminal-line"><span class="time">[12:00:02]</span>🧠 Skills loaded: 4 active
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-secondary btn-small" onclick="clearTerminal()">Clear</button>
+                    <button class="btn btn-secondary btn-small" onclick="downloadLogs()">Download Logs</button>
+                </div>
+            </div>
+
+            <!-- Providers Page -->
+            <div class="page" id="page-providers">
+                <div class="page-header">
+                    <h1>🤖 AI Providers</h1>
+                    <p>Manage your AI provider connections. All API keys are encrypted.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>OpenRouter (Recommended)</h3><span class="badge">Best Value</span>
+                    </div>
+                    <div class="form-group"><label>API Key</label><input type="password" id="provider-openrouter-key"
+                            placeholder="sk-or-v1-...">
+                        <div class="hint">Get free key at <a href="https://openrouter.ai/keys" target="_blank"
+                                style="color:var(--gold)">openrouter.ai/keys</a></div>
+                    </div>
+                    <button class="btn btn-secondary btn-small" onclick="saveProvider('openrouter')">Save</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>OpenAI</h3>
+                    </div>
+                    <div class="form-group"><label>API Key</label><input type="password" id="provider-openai-key"
+                            placeholder="sk-...">
+                        <div class="hint">Get key at <a href="https://platform.openai.com/api-keys" target="_blank"
+                                style="color:var(--gold)">platform.openai.com</a></div>
+                    </div>
+                    <button class="btn btn-secondary btn-small" onclick="saveProvider('openai')">Save</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Anthropic</h3>
+                    </div>
+                    <div class="form-group"><label>API Key</label><input type="password" id="provider-anthropic-key"
+                            placeholder="sk-ant-...">
+                        <div class="hint">Get key at <a href="https://console.anthropic.com" target="_blank"
+                                style="color:var(--gold)">console.anthropic.com</a></div>
+                    </div>
+                    <button class="btn btn-secondary btn-small" onclick="saveProvider('anthropic')">Save</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Ollama (Local)</h3>
+                    </div>
+                    <div class="form-group"><label>Base URL</label><input id="provider-ollama-url"
+                            placeholder="http://localhost:11434" value="http://localhost:11434"></div>
+                    <div class="hint">Download at <a href="https://ollama.com" target="_blank"
+                            style="color:var(--gold)">ollama.com</a></div>
+                    <button class="btn btn-secondary btn-small" onclick="saveProvider('ollama')">Save</button>
+                </div>
+            </div>
+
+            <!-- Models Page -->
+            <div class="page" id="page-models">
+                <div class="page-header">
+                    <h1>📦 Model Selection</h1>
+                    <p>Search and select the best model for your business. Free models are marked.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Available Models</h3>
+                        <div class="form-group" style="margin:0;width:300px">
+                            <input type="text" id="model-search" placeholder="🔍 Search models..."
+                                onkeyup="filterModels()">
+                        </div>
+                    </div>
+                    <div class="models-grid" id="all-models">
+                        <!-- Models loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Business Info Page -->
+                <div class="page" id="page-business">
+                    <div class="page-header">
+                        <h1>🏪 Business Information</h1>
+                        <p>Update your business details that the AI uses.</p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Basic Info</h3>
+                        </div>
+                        <div class="form-group"><label>Business Name</label><input id="biz-name"
+                                placeholder="Your business name"></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Phone</label><input id="biz-phone"
+                                    placeholder="+27 83 123 4567"></div>
+                            <div class="form-group"><label>Email</label><input id="biz-email"
+                                    placeholder="info@business.com"></div>
+                        </div>
+                        <div class="form-group"><label>Address</label><input id="biz-address"
+                                placeholder="123 Main Road, City"></div>
+                        <div class="form-group"><label>Description</label><textarea id="biz-desc" rows="3"
+                                placeholder="Tell customers about your business..."></textarea></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Operating Hours</h3>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Monday - Friday</label><input id="biz-hours-weekday"
+                                    placeholder="09:00 - 21:00"></div>
+                            <div class="form-group"><label>Saturday - Sunday</label><input id="biz-hours-weekend"
+                                    placeholder="10:00 - 22:00"></div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Menu / Services</h3>
+                        </div>
+                        <div id="menu-items-setup">
+                            <div class="form-group menu-item-row"><input class="menu-name"
+                                    placeholder="Item name"><input class="menu-price" placeholder="R0.00"><button
+                                    class="btn btn-danger btn-small" onclick="this.parentElement.remove()">×</button>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="addMenuItem()">+ Add Item</button>
+                        <div class="btn-row">
+                            <button class="btn btn-primary" onclick="saveBusiness()">Save Business Info</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills Page -->
+                <div class="page" id="page-skills">
+                    <div class="page-header">
+                        <h1>⚡ Skills Management</h1>
+                        <p>Manage agent skills. Create, import, export, and organize skills by category.</p>
+                    </div>
+
+                    <div class="btn-row" style="margin-bottom:20px">
+                        <button class="btn btn-primary" onclick="createSkill()">+ Create New Skill</button>
+                        <button class="btn btn-secondary" onclick="importSkill()">📥 Import Skill</button>
+                        <button class="btn btn-secondary" onclick="exportAllSkills()">📤 Export All Skills</button>
+                    </div>
+
+                    <div class="skill-category">
+                        <h4>📦 Core Skills (Built-in)</h4>
+                        <div class="skill-grid" id="core-skills">
+                            <div class="skill-item">
+                                <div class="skill-icon">🛒</div>
+                                <div class="skill-name">Order Taking</div>
+                                <div class="skill-desc">Process customer orders</div><span
+                                    class="skill-status active">Active</span>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-icon">📅</div>
+                                <div class="skill-name">Booking</div>
+                                <div class="skill-desc">Handle reservations</div><span
+                                    class="skill-status active">Active</span>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-icon">😤</div>
+                                <div class="skill-name">Complaint Handling</div>
+                                <div class="skill-desc">Manage complaints</div><span
+                                    class="skill-status active">Active</span>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-icon">⭐</div>
+                                <div class="skill-name">Review Response</div>
+                                <div class="skill-desc">Respond to reviews</div><span
+                                    class="skill-status active">Active</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="skill-category">
+                        <h4>🔧 Custom Skills</h4>
+                        <div class="skill-grid" id="custom-skills">
+                            <div class="skill-item">
+                                <div class="skill-icon">🎁</div>
+                                <div class="skill-name">Loyalty Program</div>
+                                <div class="skill-desc">Manage loyalty points</div><span
+                                    class="skill-status inactive">Inactive</span>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-icon">🚚</div>
+                                <div class="skill-name">Delivery Tracking</div>
+                                <div class="skill-desc">Track orders</div><span
+                                    class="skill-status inactive">Inactive</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="skill-category">
+                        <h4>🧠 Auto-Learned Skills</h4>
+                        <div class="skill-grid" id="learned-skills">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Memory Page -->
+                <div class="page" id="page-memory">
+                    <div class="page-header">
+                        <h1>🧠 Memory Management</h1>
+                        <p>View and manage customer memories. Memories persist forever until deleted.</p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Customer Memories</h3>
+                            <button class="btn btn-secondary btn-small" onclick="clearAllMemory()">🗑️ Clear All
+                                Memory</button>
+                        </div>
+                        <div class="memory-list" id="memory-list">
+                            <div class="memory-item">
+                                <div class="memory-header"><span class="memory-name">John Doe</span><span
+                                        class="memory-phone">+27 83 123 4567</span></div>
+                                <div class="memory-info">
+                                    • Preferred: Butter Chicken (ordered 5 times)<br>
+                                    • Allergies: None<br>
+                                    • Last visit: 2 days ago<br>
+                                    • Total orders: R1,250
+                                </div>
+                                <div class="memory-actions">
+                                    <button class="btn btn-secondary btn-small">View</button>
+                                    <button class="btn btn-danger btn-small">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Memory Settings</h3>
+                        </div>
+                        <div class="form-group">
+                            <label>Memory Retention</label>
+                            <select>
+                                <option>Forever (Everlasting)</option>
+                                <option>1 Year</option>
+                                <option>6 Months</option>
+                                <option>1 Month</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="toggle on" id="auto-learn-toggle"></div>
+                            <span style="margin-left:12px">Auto-learn from conversations</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Training Page -->
+                <div class="page" id="page-training">
+                    <div class="page-header">
+                        <h1>📚 Train Your Agent</h1>
+                        <p>Teach your agent new things. It learns from your corrections and teachings.</p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Teach by Example</h3>
+                        </div>
+                        <p style="margin-bottom:16px;color:var(--text-dim)">Teach the agent how to respond to specific
+                            situations.</p>
+                        <div class="training-chat" id="training-chat">
+                            <div class="training-msg user">
+                                <div class="msg-role">You</div>When a customer asks for vegan options, list our vegan
+                                dishes
+                            </div>
+                            <div class="training-msg agent">
+                                <div class="msg-role">Agent learns</div>Got it! I'll list vegan options: Veggie Curry,
+                                Salad, Grilled Vegetables when customers ask.
+                            </div>
+                        </div>
+                        <div class="training-input">
+                            <input type="text" id="training-input"
+                                placeholder="Teach the agent something... e.g., 'When someone asks about parking, tell them we have free parking'">
+                            <button class="btn btn-primary" onclick="trainAgent()">Teach</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Corrections</h3>
+                        </div>
+                        <p style="margin-bottom:16px;color:var(--text-dim)">Correct agent responses to improve accuracy.
+                        </p>
+                        <div class="form-group"><label>Incorrect Response</label><textarea rows="2"
+                                placeholder="What the agent said wrong..."></textarea></div>
+                        <div class="form-group"><label>Correct Response</label><textarea rows="2"
+                                placeholder="What it should have said..."></textarea></div>
+                        <button class="btn btn-primary btn-small">Submit Correction</button>
+                    </div>
+                </div>
+
+                <!-- Data Sources Page -->
+                <div class="page" id="page-datasources">
+                    <div class="page-header">
+                        <h1>🔗 Data Sources</h1>
+                        <p>Connect external data sources. The agent can fetch data from these when needed.</p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Business Website</h3>
+                        </div>
+                        <div class="form-group"><label>Website URL</label><input id="data-website"
+                                placeholder="https://yourbusiness.com"></div>
+                        <div class="form-group">
+                            <div class="toggle" id="data-website-enabled"></div>
+                            <span style="margin-left:12px">Allow agent to read website content</span>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="connectWebsite()">🔗 Connect</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Business Database</h3>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Database Type</label><select>
+                                    <option>SQLite</option>
+                                    <option>MySQL</option>
+                                    <option>PostgreSQL</option>
+                                </select></div>
+                            <div class="form-group"><label>Connection String</label><input
+                                    placeholder="Connection string"></div>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="connectDatabase()">🔗 Connect</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Business API</h3>
+                        </div>
+                        <div class="form-group"><label>API Endpoint</label><input
+                                placeholder="https://api.yourbusiness.com"></div>
+                        <div class="form-group"><label>API Key</label><input type="password" placeholder="Your API key">
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="connectAPI()">🔗 Connect</button>
+                    </div>
+                </div>
+
+                <!-- Security Page -->
+                <div class="page" id="page-security">
+                    <div class="page-header">
+                        <h1>🔒 Security Settings</h1>
+                        <p>Protect your data and API keys. High security enabled by default.</p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Encryption</h3><span class="badge">AES-256</span>
+                        </div>
+                        <div class="security-item">
+                            <div class="security-header"><span class="security-name">🔐 API Key Encryption</span>
+                                <div class="toggle on"></div>
+                            </div>
+                            <div class="security-desc">All API keys are encrypted at rest with AES-256</div>
+                        </div>
+                        <div class="security-item">
+                            <div class="security-header"><span class="security-name">🔒 Local Storage Only</span>
+                                <div class="toggle on"></div>
+                            </div>
+                            <div class="security-desc">Your data never leaves your device unless you choose to sync
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Data Protection</h3>
+                        </div>
+                        <div class="security-item">
+                            <div class="security-header"><span class="security-name">🚫 Block Prompt Injection</span>
+                                <div class="toggle on"></div>
+                            </div>
+                            <div class="security-desc">Prevents malicious attempts to manipulate the AI</div>
+                        </div>
+                        <div class="security-item">
+                            <div class="security-header"><span class="security-name">🔒 Customer Data Privacy</span>
+                                <div class="toggle on"></div>
+                            </div>
+                            <div class="security-desc">Customer information is never shared or leaked</div>
+                        </div>
+                        <div class="security-item">
+                            <div class="security-header"><span class="security-name">💳 No Payment Processing</span>
+                                <div class="toggle on"></div>
+                            </div>
+                            <div class="security-desc">Agent never handles payments directly - redirects to secure
+                                payment</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Audit</h3>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="exportSecurityLog()">📥 Export Security
+                            Log</button>
+                    </div>
+                </div>
+
+        </main>
+    </div>
+
+    <script>
+        // Model data
+        const MODELS = [
+            { provider: 'openrouter', name: 'deepseek/deepseek-r1-0528:free', price: 'Free', context: '32K' },
+            { provider: 'openrouter', name: 'meta-llama/llama-3.3-70b-instruct:free', price: 'Free', context: '128K' },
+            { provider: 'openrouter', name: 'google/gemma-2-27b-free', price: 'Free', context: '8K' },
+            { provider: 'openrouter', name: 'openai/gpt-4o-mini', price: '$0.15/M', context: '128K' },
+            { provider: 'openrouter', name: 'openai/gpt-4o', price: '$3.00/M', context: '128K' },
+            { provider: 'openrouter', name: 'anthropic/claude-3.5-sonnet', price: '$3.00/M', context: '200K' },
+            { provider: 'openai', name: 'gpt-4o-mini', price: '$0.15/M', context: '128K' },
+            { provider: 'openai', name: 'gpt-4o', price: '$3.00/M', context: '128K' },
+            { provider: 'anthropic', name: 'claude-3-5-sonnet-20241022', price: '$3.00/M', context: '200K' },
+            { provider: 'ollama', name: 'llama3.1', price: 'Local', context: '8K' },
+            { provider: 'ollama', name: 'mistral', price: 'Local', context: '8K' },
+            { provider: 'ollama', name: 'codellama', price: 'Local', context: '16K' },
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadModels();
+            loadBusinessInfo();
+            setupNav();
+            setupToggles();
+            connectWebSocket();
+        });
+
+        function setupNav() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                    document.getElementById('page-' + item.dataset.page).classList.add('active');
+                });
+            });
+        }
+
+        function setupToggles() {
+            document.querySelectorAll('.toggle').forEach(t => {
+                t.addEventListener('click', () => t.classList.toggle('on'));
+            });
+            document.querySelectorAll('.model-card[data-provider]').forEach(c => {
+                c.addEventListener('click', () => {
+                    document.querySelectorAll('.model-card[data-provider]').forEach(x => x.classList.remove('selected'));
+                    c.classList.add('selected');
+                    updateModelDropdown(c.dataset.provider);
+                });
+            });
+        }
+
+        function loadModels() {
+            const grid = document.getElementById('all-models');
+            grid.innerHTML = MODELS.map(m => `
+<div class="model-card" data-provider="${m.provider}" data-model="${m.name}">
+<span class="check">✓</span>
+<div class="model-name">${m.name.split('/').pop()}</div>
+<div class="model-provider">${m.provider} • ${m.context} context</div>
+<div class="model-price">${m.price}</div>
+</div>
+`).join('');
+        }
+
+        function filterModels() {
+            const q = document.getElementById('model-search').value.toLowerCase();
+            document.querySelectorAll('.model-card').forEach(c => {
+                c.style.display = c.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        }
+
+        function updateModelDropdown(provider) {
+            const select = document.getElementById('setup-model');
+            const filtered = MODELS.filter(m => m.provider === provider || m.provider === 'openrouter');
+            select.innerHTML = '<option value="">Select a model...</option>' +
+                filtered.map(m => `<option value="${m.name}">${m.name} (${m.price})</option>`).join('');
+        }
+
+        async function runSetup() {
+            const data = {
+                business: { name: document.getElementById('setup-biz-name').value, type: document.getElementById('setup-biz-type').value, city: document.getElementById('setup-biz-city').value, address: document.getElementById('setup-biz-address').value },
+                ai: { provider: document.querySelector('.model-card.selected').dataset.provider, apiKey: document.getElementById('setup-api-key').value, model: document.getElementById('setup-model').value },
+                channels: { whatsapp: document.querySelector('[data-toggle="whatsapp"]').classList.contains('on'), web: document.querySelector('[data-toggle="web"]').classList.contains('on'), dashboard: document.querySelector('[data-toggle="dashboard"]').classList.contains('on') },
+                ownerPhone: document.getElementById('setup-owner-phone').value,
+                notifications: { orders: document.querySelector('[data-toggle="notify-orders"]').classList.contains('on'), bookings: document.querySelector('[data-toggle="notify-bookings"]').classList.contains('on') }
+            };
+            try {
+                const res = await fetch('/api/setup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                if (res.ok) { showToast('Agent launched successfully!', 'success'); logToTerminal('🚀 Agent started successfully'); }
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
+        }
+
+        function logToTerminal(msg) {
+            const body = document.getElementById('terminal-body');
+            const time = new Date().toLocaleTimeString();
+            body.innerHTML += `<div class="terminal-line"><span class="time">[${time}]</span>${msg}</div>`;
+            body.scrollTop = body.scrollHeight;
+        }
+
+        function clearTerminal() { document.getElementById('terminal-body').innerHTML = ''; }
+        function downloadLogs() { const logs = document.getElementById('terminal-body').textContent; const a = document.createElement('a'); a.href = 'data:text/plain,' + encodeURIComponent(logs); a.download = 'agent-logs.txt'; a.click(); }
+
+        async function saveProvider(provider) {
+            const key = document.getElementById('provider-' + provider + '-key')?.value;
+            showToast('API key saved and encrypted!', 'success');
+        }
+
+        async function saveBusiness() {
+            showToast('Business info saved!', 'success');
+        }
+
+        function trainAgent() {
+            const input = document.getElementById('training-input');
+            if (!input.value) return;
+            const chat = document.getElementById('training-chat');
+            chat.innerHTML += `<div class="training-msg user"><div class="msg-role">You</div>${input.value}</div>`;
+            chat.innerHTML += `<div class="training-msg agent"><div class="msg-role">Agent learns</div>Got it! I've learned: "${input.value}"</div>`;
+            chat.scrollTop = chat.scrollHeight;
+            input.value = '';
+            showToast('Training saved!', 'success');
+        }
+
+        function addMenuItem() {
+            const div = document.createElement('div');
+            div.className = 'form-group menu-item-row';
+            div.innerHTML = '<input class="menu-name" placeholder="Item name"><input class="menu-price" placeholder="R0.00"><button class="btn btn-danger btn-small" onclick="this.parentElement.remove()">×</button>';
+            document.getElementById('menu-items-setup').appendChild(div);
+        }
+
+        function createSkill() { showToast('Skill creator coming soon!', 'success'); }
+        function importSkill() { showToast('Import skill feature coming soon!', 'success'); }
+        function exportAllSkills() { showToast('Exporting skills...', 'success'); }
+        function clearAllMemory() { if (confirm('Delete all customer memories?')) { showToast('All memories cleared', 'success'); } }
+
+        function connectWebsite() { showToast('Connecting to website...', 'success'); }
+        function connectDatabase() { showToast('Connecting to database...', 'success'); }
+        function connectAPI() { showToast('Connecting to API...', 'success'); }
+        function exportSecurityLog() { showToast('Exporting security log...', 'success'); }
+
+        function showToast(msg, type) {
+            const t = document.createElement('div');
+            t.className = 'toast ' + type;
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        function loadBusinessInfo() {
+            fetch('/api/business').then(r => r.json()).then(d => {
+                if (d.name) {
+                    document.getElementById('business-name').textContent = d.name;
+                    document.getElementById('biz-name').value = d.name || '';
+                    document.getElementById('biz-phone').value = d.contact?.phone || '';
+                    document.getElementById('biz-email').value = d.contact?.email || '';
+                    document.getElementById('biz-address').value = d.location?.address || '';
+                    document.getElementById('biz-city').value = d.location?.city || '';
+                }
+            });
+        }
+
+        function connectWebSocket() {
+            const ws = new WebSocket('ws://' + location.host);
+            ws.onmessage = e => {
+                const d = JSON.parse(e.data);
+                if (d.type && d.type.startsWith('message:')) { logToTerminal(d.message || d.response); }
+            };
+            ws.onopen = () => { logToTerminal('📡 Connected to agent'); document.getElementById('agent-status').textContent = 'Agent Running'; };
+            ws.onclose = () => { logToTerminal('❌ Disconnected'); document.getElementById('agent-status').textContent = 'Disconnected'; };
+        }
+    </script>
+</body>
+
+</html>

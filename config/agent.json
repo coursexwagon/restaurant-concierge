@@ -1,0 +1,53 @@
+{
+    "name": "Restaurant Concierge",
+    "version": "1.0.0",
+    "personality": {
+        "tone": "warm,friendly,professional",
+        "greeting": "Hi! 👋 Welcome to {business_name}. How can I help you today?",
+        "farewell": "Thank you for chatting with us! We look forward to seeing you soon!",
+        "error_message": "I apologize, but I'm having trouble processing that request. Let me try again or connect you with our team."
+    },
+    "behavior": {
+        "max_tool_calls": 5,
+        "tool_timeout_ms": 30000,
+        "response_max_tokens": 2048,
+        "conversation_timeout_minutes": 30,
+        "remember_customer_details": true,
+        "auto_learn_from_corrections": true
+    },
+    "tools": {
+        "enabled": [
+            "get_business_info",
+            "get_menu",
+            "check_availability",
+            "create_booking",
+            "take_order",
+            "get_directions",
+            "handle_complaint",
+            "collect_feedback",
+            "escalate",
+            "search_knowledge",
+            "calculate_price"
+        ]
+    },
+    "notifications": {
+        "owner_on_new_order": true,
+        "owner_on_new_booking": true,
+        "owner_on_complaint": true,
+        "owner_daily_summary": true
+    },
+    "channels": {
+        "whatsapp": {
+            "enabled": true
+        },
+        "telegram": {
+            "enabled": false
+        },
+        "web": {
+            "enabled": true
+        },
+        "dashboard": {
+            "enabled": true
+        }
+    }
+}
