@@ -12,17 +12,11 @@ const projectRoot = join(__dirname, '..');
 async function main() {
     console.log('\n' + '='.repeat(60));
     console.log('  🤖 RESTAURANT CONCIERGE AGENT');
-    console.log('  Autonomous AI Agent Platform');
-    console.log('  🧠 Everlasting Memory | ⚡ Skills | 🔒 Secure');
+    console.log('  Server Running - Open Browser to Setup');
     console.log('='.repeat(60) + '\n');
 
-    // Check if configured
-    let needsSetup = false;
-    try {
-        await fs.access(join(projectRoot, 'config/business.json'));
-    } catch {
-        needsSetup = true;
-    }
+    // Always start server - NEVER run wizard automatically
+    // Browser handles all onboarding via setup.html
 
     // Import components
     const Gateway = (await import('./gateway/server.js')).default;
@@ -35,7 +29,7 @@ async function main() {
     const RAGSystem = (await import('./knowledge/rag.js')).default;
     const WebScraper = (await import('./knowledge/web-scraper.js')).default;
 
-    console.log('🔄 Starting components...\n');
+    console.log('🔄 Starting server...\n');
 
     // Gateway
     const gateway = new Gateway(parseInt(process.env.GATEWAY_PORT) || 18789);
@@ -68,7 +62,7 @@ async function main() {
     const whatsapp = new WhatsAppChannel(gateway);
     await whatsapp.start();
 
-    // Dashboard with all components
+    // Dashboard with all components - handles setup in browser!
     const dashboard = new Dashboard(gateway, ordersManager, memoryStore, skillsManager);
     dashboard.start();
 
@@ -81,10 +75,8 @@ async function main() {
     });
 
     // Log startup
-    dashboard.logToTerminal('🤖 Agent initialized successfully');
-    dashboard.logToTerminal(`🧠 Memory: ${memoryStore.customerMemory.size} customers loaded`);
-    dashboard.logToTerminal(`⚡ Skills: ${skillsManager.skills.size} skills loaded`);
-    dashboard.logToTerminal(`📚 Knowledge: ${knowledge.documents.length} documents loaded`);
+    dashboard.logToTerminal('🤖 Server started - open browser to setup!');
+    dashboard.logToTerminal('🌐 Go to: http://localhost:3000/setup.html');
 
     // Graceful shutdown
     process.on('SIGINT', shutdown);
@@ -92,24 +84,18 @@ async function main() {
 
     function shutdown() {
         console.log('\n\n🛑 Shutting down...');
-        dashboard.logToTerminal('🛑 Agent shutting down...');
+        dashboard.logToTerminal('🛑 Server shutting down...');
         gateway.close();
         process.exit(0);
     }
 
     console.log('\n' + '='.repeat(60));
-    console.log('  ✅ Agent is running!');
+    console.log('  ✅ Server is running!');
     console.log('='.repeat(60));
-    console.log('\n📱 Web Setup: http://localhost:' + (process.env.DASHBOARD_PORT || 3000) + '/setup.html');
-    console.log('🌐 Dashboard: http://localhost:' + (process.env.DASHBOARD_PORT || 3000));
-    console.log('📡 Gateway: ws://127.0.0.1:' + (process.env.GATEWAY_PORT || 18789));
-    console.log('\n🧠 Features:');
-    console.log('   • Everlasting Memory');
-    console.log('   • Skills Management');
-    console.log('   • Web Scraping');
-    console.log('   • Training System');
-    console.log('   • High Security (AES-256)');
-    console.log('\nPress Ctrl+C to stop\n');
+    console.log('\n📱 OPEN IN BROWSER:');
+    console.log('   Setup: http://localhost:3000/setup.html');
+    console.log('   Dashboard: http://localhost:3000');
+    console.log('\n⏳ Waiting for browser setup...\n');
 }
 
 main().catch(err => {
